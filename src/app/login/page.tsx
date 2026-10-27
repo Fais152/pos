@@ -40,11 +40,6 @@ export default function LoginPage() {
     }
   }
 
-  function fillDemo(u: string, p: string) {
-    setUsername(u);
-    setPassword(p);
-  }
-
   return (
     <div className="relative min-h-screen bg-background lg:grid lg:grid-cols-2">
       <div className="relative hidden overflow-hidden bg-sidebar px-12 py-14 text-sidebar-foreground lg:flex lg:flex-col lg:justify-between lg:border-r lg:border-border">
@@ -95,7 +90,7 @@ export default function LoginPage() {
                   id="username"
                   name="username"
                   className="h-11 pl-9"
-                  placeholder="owner / kasir1"
+                  placeholder="Mis. kasir1"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   autoComplete="username"
@@ -140,31 +135,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 rounded-xl border border-border bg-card p-4">
-            <p className="text-xs font-semibold text-muted-foreground">Akun contoh</p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => fillDemo("owner", "owner123")}
-                className="rounded-lg border border-border bg-background px-3 py-2.5 text-left text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
-              >
-                <span className="block font-semibold">Owner</span>
-                <span className="text-xs text-muted-foreground">owner / owner123</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => fillDemo("kasir1", "kasir123")}
-                className="rounded-lg border border-border bg-background px-3 py-2.5 text-left text-sm transition-colors hover:border-primary/40 hover:bg-primary/5"
-              >
-                <span className="block font-semibold">Kasir</span>
-                <span className="text-xs text-muted-foreground">kasir1 / kasir123</span>
-              </button>
-            </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-              Akun contoh untuk mencoba aplikasi.
-            </p>
-          </div>
         </div>
       </div>
     </div>

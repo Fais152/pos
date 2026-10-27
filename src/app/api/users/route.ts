@@ -13,7 +13,7 @@ const schema = z.object({
   id: z.string().optional(),
   name: z.string().trim().min(1).max(120),
   username: z.string().trim().min(3).max(80).regex(/^[a-zA-Z0-9._-]+$/),
-  password: z.string().min(4).max(200).optional(),
+  password: z.string().min(8).max(200).optional(),
   isActive: z.boolean().default(true),
 });
 

@@ -179,8 +179,8 @@ function CashierDialog({ onClose }: { onClose: () => void }) {
   async function save() {
     if (saving) return;
     const normalizedUsername = username.trim();
-    if (!name.trim() || !normalizedUsername || password.length < 4) {
-      toast.error("Lengkapi nama, username, dan password minimal 4 karakter.");
+    if (!name.trim() || !normalizedUsername || password.length < 8) {
+      toast.error("Lengkapi nama, username, dan password minimal 8 karakter.");
       return;
     }
     if (normalizedUsername.length < 3) {
@@ -285,20 +285,32 @@ function ResetPasswordDialog({
   user: User;
   onClose: () => void;
 }) {
+  const { user: currentUser, logout } = useAppSession();
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [saving, setSaving] = useState(false);
+  const isSelf = currentUser?.id === user.id;
 
   async function save() {
     if (saving) return;
-    if (password.length < 4) {
-      toast.error("Password minimal 4 karakter.");
+    if (password.length < 8) {
+      toast.error("Password minimal 8 karakter.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Konfirmasi password belum sama.");
       return;
     }
     setSaving(true);
     try {
       await mockDb.saveUser({ ...user, password });
-      toast.success(`Password ${user.name} berhasil direset.`);
       onClose();
+      if (isSelf) {
+        toast.success("Password diperbarui. Silakan masuk lagi.");
+        await logout();
+      } else {
+        toast.success(`Password ${user.name} berhasil direset.`);
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Gagal mereset password.");
     } finally {
@@ -315,21 +327,37 @@ function ResetPasswordDialog({
     >
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Reset Password</DialogTitle>
+          <DialogTitle>{isSelf ? "Ganti Password" : "Reset Password"}</DialogTitle>
           <DialogDescription>
-            Atur password baru untuk {user.name} ({user.username}).
+            {isSelf
+              ? `Buat password baru untuk akun Anda (@${user.username}). Setelah disimpan, Anda akan keluar.`
+              : `Atur password baru untuk ${user.name} (@${user.username}). Sesi kasir ini akan berakhir.`}
           </DialogDescription>
         </DialogHeader>
-        <div className="space-y-1.5">
-          <Label htmlFor="new-password">Password baru</Label>
-          <Input
-            id="new-password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            maxLength={200}
-          />
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="new-password">Password baru</Label>
+            <Input
+              id="new-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">Minimal 8 karakter.</p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="confirm-password">Ulangi password</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+              maxLength={200}
+            />
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={saving}>
@@ -452,6 +480,16 @@ export default function PengaturanPage() {
               <p className="text-xs text-muted-foreground">
                 @{currentUser?.username} · akses penuh
               </p>
+              {currentUser && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 gap-1.5"
+                  onClick={() => setResetTarget(currentUser)}
+                >
+                  <KeyRound className="h-3.5 w-3.5" /> Ganti Password
+                </Button>
+              )}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               Owner tidak dapat menonaktifkan akunnya sendiri.
